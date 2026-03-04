@@ -1,0 +1,85 @@
+---M9. FIRST_VALUE(salary) OVER (PARTITION BY department_id ORDER BY salary). Hint: Min salary in dept.
+select employee_id,department_id,salary,
+first_value(salary) over(
+    partition by department_id
+    order by salary
+)
+from hr.employees;
+---M10. LAST_VALUE(salary) OVER (PARTITION BY department_id ORDER BY salary RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING). Hint: Max salary in dept.
+select employee_id,department_id,salary,
+last_value(salary) over (
+    partition by department_id
+    order by salary range between unbounded preceding 
+    and unbounded following
+)
+from hr.employees;
+
+---M11. LAG(salary, 2, 0) OVER (ORDER BY employee_id). Hint: Salary from 2 rows back; default 0.
+select employee_id,department_id,salary,
+lag(salary,2,0) over (
+    order by employee_id
+)
+from hr.employees;
+---M12. SUM(salary) OVER (PARTITION BY job_id ORDER BY hire_date). Hint: Running total per job.
+select employee_id,department_id,salary,
+sum(salary) over (
+    partition by job_id
+    order by hire_date
+)
+from hr.employees;
+
+---M13. LEAD(commission_pct) OVER (PARTITION BY department_id ORDER BY employee_id). Hint: Next row's commission_pct in dept.
+select employee_id,department_id,commission_pct,
+lead(commission_pct) over(
+    partition by department_id
+    order by employee_id
+)
+from hr.employees;
+
+---M14. AVG(salary) OVER (ORDER BY hire_date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW). Hint: Moving 5-row average.
+select employee_id,department_id,salary,
+avg(salary) over (
+    order by hire_date 
+    rows between 4 preceding and current row
+)
+from hr.employees;
+
+---M15. LAG(first_name) OVER (PARTITION BY department_id ORDER BY employee_id). Hint: Previous employee's first name in dept.
+select employee_id,department_id,first_name,
+lag(first_name) over (
+    partition by department_id
+    order by employee_id
+)
+from hr.employees;
+
+---M16. SUM(salary) OVER () AS total_company_salary (same value per row). Hint: No PARTITION/ORDER or ORDER BY with full window.
+select employee_id,department_id,salary,
+sum(salary) over()
+from hr.employees;
+
+---M17. FIRST_VALUE(hire_date) OVER (PARTITION BY department_id ORDER BY hire_date). Hint: Earliest hire in dept.
+select employee_id,department_id,hire_date,
+first_value(hire_date) over(
+    partition by department_id
+    order by hire_date
+)
+from hr.employees;
+---M18. LAST_VALUE(hire_date) OVER (PARTITION BY department_id ORDER BY hire_date RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING). Hint: Latest hire in dept.
+select employee_id,department_id,hire_date,
+last_value(hire_date) over(
+    partition by department_id
+    order by hire_date
+)
+from hr.employees;
+---M19. LAG(salary) OVER (ORDER BY salary DESC). Hint: Next lower salary (order by salary desc so "previous" in that order).
+select employee_id,department_id,salary,
+lag(salary) over(
+    order by salary desc
+)
+from hr.employees;
+---M20. COUNT(*) OVER (PARTITION BY department_id). Hint: Count of employees in dept per row.
+select employee_id,department_id,
+count(*)over(
+    partition by department_id
+)
+from hr.employees;
