@@ -1,0 +1,101 @@
+---Use LEAD(hire_date) to show the next employee hire date within the same department (order by hire_date).
+SELECT 
+    employee_id,
+    department_id,
+    hire_date,
+    LEAD(hire_date) OVER (
+        PARTITION BY department_id 
+        ORDER BY hire_date
+    ) AS next_hire_date
+FROM hr.employees;
+---Show cumulative salary (running total) per department, ordered by hire_date within each department
+SELECT 
+    employee_id,
+    department_id,
+    hire_date,
+    salary,
+    SUM(salary) OVER (
+        PARTITION BY department_id
+        ORDER BY hire_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS cumulative_salary
+FROM hr.employees;
+------------------------------------------
+--M1. LAG(salary) OVER (PARTITION BY department_id ORDER BY employee_id). Hint: Previous row's salary in dept.
+SELECT 
+    employee_id,
+    department_id,
+    salary,
+    lag(salary) OVER (
+        PARTITION BY department_id 
+        ORDER BY employee_id
+    ) 
+FROM hr.employees;
+---M2. LEAD(salary) OVER (PARTITION BY department_id ORDER BY employee_id). Hint: Next row's salary in dept.
+SELECT 
+    employee_id,
+    department_id,
+    salary,
+    LEAD(salary) OVER (
+        PARTITION BY department_id 
+        ORDER BY employee_id
+    )
+FROM HR.employees;
+---M3. SUM(salary) OVER (ORDER BY hire_date ROWS UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total. Hint: Running total by hire_date.
+SELECT 
+    employee_id,
+    hire_date,
+    salary,
+    SUM(salary) OVER (
+        ORDER BY hire_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) 
+FROM hr.employees;
+---M4.AVG(salary) OVER (PARTITION BY department_id). Hint: Dept average per row.
+select
+employee_id,
+department_id,
+salary,
+avg(salary) over (
+    partition by department_id
+)
+from hr.employees;
+---M5. LAG(hire_date) OVER (PARTITION BY department_id ORDER BY hire_date). Hint: Previous hire date in dept.
+select employee_id,department_id,hire_date,
+lag(hire_date) over (
+    partition by department_id
+    order by hire_date
+)
+from hr.employees;
+---M6. SUM(salary) OVER (PARTITION BY department_id ORDER BY hire_date ROWS UNBOUNDED PRECEDING AND CURRENT ROW). Hint: Running total per dept by hire_date
+select employee_id,department_id,salary,
+sum(salary) over (
+    partition by department_id
+    order by hire_date
+    rows between unbounded preceding and current row
+)
+from hr.employees;
+---M7. LEAD(hire_date) OVER (PARTITION BY department_id ORDER BY hire_date). Hint: Next hire date in dept.
+select employee_id,department_id,hire_date,
+lead(hire_date) over (
+    partition by department_id 
+    order by hire_date
+)
+from hr.employees;
+---M8. AVG(salary) OVER (PARTITION BY department_id ORDER BY employee_id ROWS BETWEEN 2 PRECEDING AND CURRENT ROW). Hint: Moving 3-row average per dept.
+select employee_id,department_id,salary,
+avg(salary) over(
+    partition by department_id
+    order by employee_id
+    rows between 2 preceding and current row
+)
+from hr.employees;
+
+---M9. FIRST_VALUE(salary) OVER (PARTITION BY department_id ORDER BY salary). Hint: Min salary in dept.
+select employee_id,department_id,salary,
+first_value(salary) over(
+    partition by department_id
+    order by salary
+)
+from hr.employees;
+
