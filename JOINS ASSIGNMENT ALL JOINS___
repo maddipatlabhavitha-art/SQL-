@@ -1,0 +1,102 @@
+-- 1. Create CUSTOMERS Table
+CREATE TABLE CUSTOMERS (
+    CUSTOMER_ID NUMBER PRIMARY KEY,
+    FIRST_NAME VARCHAR2(50),
+    LAST_NAME VARCHAR2(50),
+    CITY VARCHAR2(50),
+    PHONE_NUMBER VARCHAR2(20),
+    LOYALTY_POINTS NUMBER
+);
+INSERT INTO CUSTOMERS VALUES (101, 'John', 'Doe', 'New York', '555-0100', 500);
+INSERT INTO CUSTOMERS VALUES (102, 'Jane', 'Smith', NULL, '555-0101', 120);
+INSERT INTO CUSTOMERS VALUES (103, 'Robert', 'Brown', 'Chicago', NULL, 0);
+INSERT INTO CUSTOMERS VALUES (104, 'Emily', 'Davis', NULL, NULL, NULL); -- Lots of NULLs
+INSERT INTO CUSTOMERS VALUES (105, 'Michael', 'Wilson', 'Miami', '555-0105', NULL);
+select * from customers;
+
+CREATE TABLE ORDERS3 (
+    ORDER_ID NUMBER PRIMARY KEY,
+    CUSTOMER_ID NUMBER,
+    ORDER_DATE DATE,
+    TOTAL_AMOUNT NUMBER(10, 2),
+    DISCOUNT_AMT NUMBER(10, 2), 
+    SHIPPING_DATE DATE          
+);
+INSERT INTO ORDERS3 VALUES (5001, 101, DATE '2023-10-01', 150.00, 10.00, DATE '2023-10-03');
+INSERT INTO ORDERS3 VALUES (5002, 102, DATE '2023-10-02', 200.50, NULL, DATE '2023-10-05'); 
+INSERT INTO ORDERS3 VALUES (5003, 101, DATE '2023-10-05', 75.00, 5.00, NULL);
+INSERT INTO ORDERS3 VALUES (5004, 104, DATE '2023-10-06', 300.00, NULL, NULL); 
+INSERT INTO ORDERS3 VALUES (5005, 105, DATE '2023-10-07', 50.00, 0.00, DATE '2023-10-08');
+INSERT INTO ORDERS3 VALUES (5006, NULL, DATE '2023-10-08', 20.00, NULL, DATE '2023-10-09'); 
+select * from orders3;
+
+---(Inner Join) Retrieve a list of customers who have placed at least one order. Display Name and Order ID. Note: This excludes customers with no orders and orders with NULL Customer IDs.
+
+select c.first_name,c.last_name,o.order_id
+from customers c
+inner join orders3 o on
+c.customer_id=o.customer_id;
+
+---1.(Inner Join) List the FIRST_NAME of the customer and the TOTAL_AMOUNT for all orders that have a Discount (DISCOUNT_AMT is not null).
+
+select c.first_name,o.total_amount
+from customers c
+inner join orders3 o on
+c.customer_id = o.customer_id;
+where o.discount_amt is null;
+
+---2.(Left Join) List all Customers. If they have an order, display the ORDER_DATE. If not, ensure the row still appears with a NULL date.
+
+select c.first_name,c.last_name,o.ORDER_DATE
+from customers c
+left join orders3 o on
+c.customer_id = o.customer_id;
+
+---3.(Right Join) Display ORDER_ID and FIRST_NAME. We want to see all orders, including the one with CUSTOMER_ID NULL (Order 5006).
+
+select c.first_name,o.order_id
+from customers c 
+right join orders3 o on 
+c.customer_id = o.customer_id;
+
+---4.(Full Outer Join) Find the count of rows returned when you Full Outer Join Customers and Orders. (Try to predict the number before running it).
+
+select count(*)
+from customers c
+full outer join orders3 o on
+c.customer_id = o.customer_id;
+
+---5.(Left Join - Anti Join) Find the CUSTOMER_IDs that exist in the CUSTOMERS table but do NOT exist in the ORDERS table.
+
+SELECT c.customer_id
+FROM customers c
+LEFT JOIN orders3 o
+ON c.customer_id = o.customer_id
+WHERE o.customer_id IS NULL;
+
+---6.(Self Join) Find pairs of Orders (O1, O2) that were placed on the exact same ORDER_DATE.
+
+SELECT o1.order_id AS order1,
+       o2.order_id AS order2,
+       o1.order_date
+FROM orders o1
+JOIN orders o2
+ON o1.order_date = o2.order_date
+AND o1.order_id < o2.order_id;
+
+---7.(Cross Join) Create a list showing every Customer paired with every unique CITY found in the Customer table.
+
+select c.first_name,c.last_name,c.city
+from customers c
+cross join orders3 o
+
+---8.(Inner Join + Aggregates) Calculate the total DISCOUNT_AMT given to customers living in 'New York'.
+
+SELECT SUM(o.Discount_amt) 
+FROM customers c
+INNER JOIN orders3 o
+ON c.customer_id = o.customer_id
+WHERE c.city = 'New York';
+
+---9.(Left Join + NVL) Select FIRST_NAME and the SHIPPING_DATE. If the shipping date is NULL (either because the order isn't shipped OR the customer has no order), display 'Not Shipped'.
+
