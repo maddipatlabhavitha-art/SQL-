@@ -1,0 +1,93 @@
+SELECT employee_id, first_name, department_id, salary,
+  RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS salary_rank
+FROM hr.employees;
+
+---M1. ROW_NUMBER() OVER (ORDER BY salary DESC) for each employee. Hint: Add ROW_NUMBER() OVER (ORDER BY salary DESC) AS rn.
+SELECT employee_id,
+       first_name,
+       salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC)as rn
+FROM hr.employees;
+
+---M2. RANK() OVER (PARTITION BY department_id ORDER BY salary DESC). Hint: Rank by salary within department.
+select employee_id,first_name,department_id,salary,
+rank()over(
+    partition by department_id
+    order by salary desc
+)
+from hr.employees;
+
+---M3. DENSE_RANK() OVER (ORDER BY hire_date) for tenure order. Hint: DENSE_RANK() OVER (ORDER BY hire_date).
+SELECT employee_id,
+       first_name,
+       hire_date,
+       DENSE_RANK() OVER (ORDER BY hire_date) 
+FROM hr.employees;
+
+---M4. NTILE(4) OVER (ORDER BY salary) for salary quartiles. Hint: NTILE(4) OVER (ORDER BY salary) AS quartile.
+select employee_id,first_name,department_id,salary,
+ntile(4) over(
+    order by salary
+)as quartile
+from hr.employees;
+
+---M5. Top 1 per department by salary: use ROW_NUMBER() in subquery, then WHERE rn = 1. Hint: Subquery with
+SELECT *
+FROM (
+    SELECT employee_id,
+           first_name,
+           department_id,
+           salary,
+           ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rn
+    FROM hr.employees
+)
+WHERE rn = 1;
+
+---M6. RANK() OVER (ORDER BY salary DESC NULLS LAST). Hint: NULLS LAST in ORDER BY.
+select employee_id,first_name,department_id,salary,
+rank()over(order by salary desc nulls last)
+from hr.employees;
+
+---M7. ROW_NUMBER() OVER (PARTITION BY job_id ORDER BY hire_date). Hint: Row number by hire date within job.
+select employee_id,first_name,department_id,hire_date,
+row_number()over(
+    partition by job_id
+    order by hire_date)
+    from hr.employees;
+
+---M8. DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary). Hint: Dense rank by salary within dept.
+select employee_id,first_name,department_id,salary,
+DENSE_RANK()over(
+    partition by department_id
+    order by salary
+)
+from hr.employees;
+
+---M9. NTILE(5) OVER (ORDER BY salary) for quintiles. Hint: NTILE(5).
+select employee_id,first_name,department_id,salary,
+ntile(5)over(
+    order by salary
+)as quantiles
+from hr.employees;
+
+---M10. RANK() OVER (PARTITION BY department_id ORDER BY hire_date DESC) (newest first = 1). Hint: Rank by hire_date DESC per dept.
+select employee_id,first_name,department_id,hire_date,
+rank()over(
+    partition by department_id
+    order by hire_date desc
+)
+from hr.employees;
+
+---M11. Show employee_id, salary, and ROW_NUMBER() OVER (ORDER BY employee_id). Hint: Simple row number by employee_id.
+select employee_id,salary,
+row_number()over (
+    order by employee_id
+)
+from hr.employees;
+
+---M12. DENSE_RANK() OVER (ORDER BY commission_pct DESC NULLS LAST). Hint: Rank commission; NULLS LAST.
+select employee_id,first_name,salary,department_id,
+dense_rank()over(
+    order by commission_pct desc nulls last
+)
+from hr.employees;
